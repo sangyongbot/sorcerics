@@ -382,6 +382,11 @@ section { position: relative; }
    SIMPLE PAGES (wiki / careers)
    ===================================================================== */
 .simple { min-height: var(--vh); }
+/* One-viewport pages: <main class="fit"> fills exactly 100vh with the footer
+   pinned at the bottom, so nothing scrolls unless the content is taller. */
+main.fit { display: flex; flex-direction: column; min-height: var(--vh); }
+main.fit > section { flex: 1 0 auto; min-height: 0; }
+main.fit > .footer { flex: 0 0 auto; }
 .simple__copy { position: absolute; left: calc(55 * var(--u)); top: calc(429 * var(--u)); max-width: calc(560 * var(--u)); }
 .simple__copy h1 { font-size: var(--fs-h); font-weight: 700; line-height: var(--lh); text-transform: uppercase; color: var(--black); }
 .simple__copy p { font-size: var(--fs-body); line-height: calc(15.5 / 13); color: var(--grey); margin-top: calc(15 * var(--u)); }
