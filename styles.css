@@ -286,7 +286,10 @@ section { position: relative; }
    ===================================================================== */
 .dv2 { height: calc(var(--n, 13) * var(--vh)); }
 .dv2__stage { position: sticky; top: 0; height: var(--vh); overflow: hidden; background: var(--white); }
-.dv2 .ch { position: absolute; inset: 0; pointer-events: none; }
+/* Each chapter keeps the deck's 768pt-tall composition and is centred in the
+   viewport when the viewport is taller than the deck page (top-aligned when
+   it is shorter), so the render + copy never sit high in the frame. */
+.dv2 .ch { position: absolute; left: 0; right: 0; top: max(0px, calc((var(--vh) - (768 * var(--u))) / 2)); height: calc(768 * var(--u)); pointer-events: none; }
 .dv2 .ch__visual { position: absolute; inset: 0; opacity: 0; visibility: hidden; will-change: opacity, transform; }
 .dv2 .ch .dv__copy, .dv2 .ch .dv__col { opacity: 0; will-change: opacity, transform; }
 .dv2__glow { position: absolute; z-index: 0; width: calc(360 * var(--u)); height: calc(360 * var(--u)); border-radius: 50%; background: radial-gradient(circle, rgba(162,228,184,0.95), rgba(162,228,184,0) 68%); filter: blur(calc(14 * var(--u))); pointer-events: none; }
@@ -492,7 +495,7 @@ main.fit > .footer { flex: 0 0 auto; }
 
   .dv2 { height: auto; padding-bottom: 20px; }
   .dv2__stage { position: static; height: auto; }
-  .dv2 .ch { position: relative; inset: auto; padding: 0 20px 56px; pointer-events: auto; }
+  .dv2 .ch { position: relative; inset: auto; top: auto; height: auto; padding: 0 20px 56px; pointer-events: auto; }
   .dv2 .ch__visual { position: relative; opacity: 1 !important; visibility: visible !important; transform: none !important; }
   .dv2 .ch .dv__copy, .dv2 .ch .dv__col { opacity: 1 !important; transform: none !important; }
   .dv2__glow { display: none; }
