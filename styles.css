@@ -1,0 +1,468 @@
+/* =====================================================================
+   SOL / sorcerics — styles
+   Layout units: the design deck is 1366 x 768 pt per screen. One deck
+   point = var(--u) = 100vw / 1366, so every measurement below is the
+   deck value multiplied by --u (e.g. calc(55 * var(--u)) = x 55pt).
+   ===================================================================== */
+
+/* ---------- fonts (Satoshi, self-hosted from Fontshare) ---------- */
+@font-face { font-family: "Satoshi"; src: url("fonts/Satoshi-400.woff2") format("woff2"); font-weight: 400; font-style: normal; font-display: swap; }
+@font-face { font-family: "Satoshi"; src: url("fonts/Satoshi-500.woff2") format("woff2"); font-weight: 500; font-style: normal; font-display: swap; }
+@font-face { font-family: "Satoshi"; src: url("fonts/Satoshi-700.woff2") format("woff2"); font-weight: 700; font-style: normal; font-display: swap; }
+@font-face { font-family: "Satoshi"; src: url("fonts/Satoshi-900.woff2") format("woff2"); font-weight: 900; font-style: normal; font-display: swap; }
+
+/* ---------- tokens ---------- */
+:root {
+  --u: calc(100vw / 1366);                 /* 1 deck point */
+  --mint: #a2e4b8;
+  --mint-2: #a1e3b8;
+  --black: #000000;
+  --white: #ffffff;
+  --ink: #262626;
+  --ink-2: #282828;
+  --grey: #6d6d6d;
+  --stage: #eaeaea;
+  --box: #aaaaaa;
+  --dot-off: #c4c4c4;
+  --red: #ea1b1b;
+
+  --font: "Satoshi", "Helvetica Neue", Helvetica, Arial, sans-serif;
+
+  /* type scale = deck sizes in points, floored for legibility */
+  --fs-nav:   max(10px, calc(8 * var(--u)));
+  --fs-body:  max(13px, calc(13 * var(--u)));
+  --fs-md:    max(16px, calc(18 * var(--u)));
+  --fs-h:     max(22px, calc(25 * var(--u)));
+  --lh: 1.2;
+
+  /* z-index tiers (Chakra-style semantic scale: nothing in <main> can
+     ever out-stack the nav because <main> is an isolated context at 0) */
+  --z-base: 0;
+  --z-raised: 10;
+  --z-film: 20;
+  --z-cover: 30;
+  --z-sticky: 1100;   /* fixed nav */
+  --z-overlay: 1300;  /* modals / loaders */
+
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --vh: 100vh;
+}
+@supports (height: 100svh) { :root { --vh: 100svh; } }
+
+/* ---------- reset ---------- */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { -webkit-text-size-adjust: 100%; overflow-x: clip; }
+html.is-locked, html.is-locked body { overflow: hidden; height: 100%; }
+body {
+  font-family: var(--font);
+  font-weight: 500;
+  font-size: var(--fs-body);
+  line-height: var(--lh);
+  color: var(--ink);
+  background: var(--black);
+  overflow-x: clip;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+body.theme-light { background: var(--white); }
+img, svg, video, canvas { display: block; max-width: 100%; }
+img { height: auto; }
+a { color: inherit; text-decoration: none; }
+button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+input, select { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--mint); outline-offset: 3px; }
+
+main { position: relative; isolation: isolate; z-index: var(--z-base); }
+section { position: relative; }
+[data-theme="dark"]  { background: var(--black); color: var(--mint); }
+[data-theme="light"] { background: var(--white); color: var(--ink); }
+
+.wm { display: block; width: 100%; height: 100%; fill: currentColor; }
+.dot { display: inline-block; width: 1em; height: 1em; border-radius: 50%; background: var(--mint); vertical-align: middle; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* =====================================================================
+   NAV — SOL wordmark (left), vertical menu (centre), sorcerics (right).
+   Deck: SOL at x37 y37 (21x8), menu at x659 y35 (8pt, 14.3pt pitch),
+   sorcerics right edge at x1327. Active item = mint dot 23pt to the left.
+   On the home page the nav starts vertically centred and rides up with
+   the first scroll until it sticks to the top (see main.js).
+   ===================================================================== */
+.nav {
+  position: fixed; top: 0; left: 0; width: 100%; height: 0;
+  z-index: var(--z-sticky);
+  color: var(--mint);
+  pointer-events: none;
+  will-change: transform;
+  transition: color 0.45s var(--ease);
+}
+.nav > * { pointer-events: auto; }
+.nav.on-light { color: var(--ink-2); }
+.nav.is-intro { pointer-events: none; }
+.nav.is-intro > * { pointer-events: none; }
+
+.nav__brand, .nav__maker { position: absolute; top: calc(36.4 * var(--u)); height: calc(9.2 * var(--u)); }
+.nav__brand { left: calc(36.4 * var(--u)); width: calc(22.2 * var(--u)); }
+.nav__maker { right: calc(38.4 * var(--u)); width: calc(63.2 * var(--u)); }
+
+.nav__menu {
+  position: absolute; left: calc(659 * var(--u)); top: calc(35 * var(--u));
+  display: flex; flex-direction: column; align-items: flex-start;
+  font-size: var(--fs-nav); line-height: 1.79; font-weight: 500; letter-spacing: 0.01em;
+  text-transform: uppercase;
+}
+.nav__menu a { position: relative; display: block; opacity: 0.5; transition: opacity 0.3s var(--ease); white-space: nowrap; }
+.nav__menu a:hover, .nav__menu a:focus-visible, .nav__menu a.is-active { opacity: 1; }
+.nav__menu a.is-active::before {
+  content: ""; position: absolute; left: -2.875em; top: 50%; width: 1em; height: 1em;
+  border-radius: 50%; background: var(--mint); transform: translateY(-50%);
+}
+.nav__row { display: flex; align-items: flex-start; }
+.nav__sub { display: flex; flex-direction: column; margin-left: 4em; }
+.nav__sub a { opacity: 0.5; }
+.nav__sub a.is-active { opacity: 1; }
+.nav__sub a.is-active::before { display: none; }
+
+/* =====================================================================
+   HOME · 1 — Cover / intro
+   Black full-window screen: mint dot -> "Elevating the Art of Living"
+   types out -> becomes SOL -> sorcerics joins -> both slide to the edges
+   and the menu appears in the middle (deck pages 1-6). Scrolling then
+   lifts this cover like a curtain over the film underneath.
+   ===================================================================== */
+.cover {
+  position: relative; z-index: var(--z-cover);
+  height: var(--vh); background: var(--black);
+  overflow: hidden;
+}
+.intro {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--mint); font-size: var(--fs-body); font-weight: 500; white-space: nowrap;
+}
+.intro__text { display: inline-block; }
+.intro__dot { display: inline-block; width: calc(8 * var(--u)); height: calc(8 * var(--u)); min-width: 7px; min-height: 7px; border-radius: 50%; background: var(--mint); margin-left: calc(3 * var(--u)); vertical-align: -0.02em; opacity: 0; }
+.intro__text:empty + .intro__dot { margin-left: 0; }
+.intro.is-done { display: none; }
+
+/* =====================================================================
+   HOME · 2 — Film (scroll-scrubbed frame sequence)
+   Starts behind the cover (margin-top: -100vh) so its sticky canvas is
+   already in place at scroll 0; the curtain reveals it as it scrubs.
+   --film-len = how many viewport heights the 120 frames are spread over.
+   ===================================================================== */
+.film {
+  position: relative; z-index: var(--z-film);
+  margin-top: calc(-1 * var(--vh));
+  height: calc((1 + var(--film-len, 4)) * var(--vh));
+  background: var(--black);
+}
+.film__sticky { position: sticky; top: 0; height: var(--vh); width: 100%; overflow: hidden; background: #e9e9e6; }
+.film__canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+.film__scrim { position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.42), rgba(0,0,0,0.12) 32%, rgba(0,0,0,0) 52%); }
+.film__cap { position: absolute; color: var(--mint); font-size: var(--fs-body); line-height: calc(16 / 13); font-weight: 500; opacity: 0; will-change: opacity, transform; text-shadow: 0 1px 14px rgba(0,0,0,0.35); }
+.film__cap--a { left: calc(923 * var(--u)); top: calc(165 * var(--u)); max-width: calc(420 * var(--u)); }
+.film__cap--b { left: 50%; top: calc(650 * var(--u)); transform: translateX(-50%); white-space: nowrap; }
+.film__cap a { display: inline-block; padding: 0.4em 0; }
+.film__hint { position: absolute; left: 50%; bottom: calc(28 * var(--u)); transform: translateX(-50%); width: 1px; height: calc(34 * var(--u)); background: var(--mint); opacity: 0.8; transform-origin: top; animation: hintPulse 2s var(--ease) infinite; }
+@keyframes hintPulse { 0% { transform: translateX(-50%) scaleY(0); opacity: 0; } 40% { transform: translateX(-50%) scaleY(1); opacity: 0.8; } 100% { transform: translateX(-50%) scaleY(1); opacity: 0; } }
+
+/* =====================================================================
+   HOME · 3 — Product intro (deck p10-13)
+   ===================================================================== */
+.pintro { min-height: var(--vh); height: max(var(--vh), calc(768 * var(--u))); overflow: hidden; }
+.pintro__device { position: absolute; left: calc(171 * var(--u)); top: calc(50% - (297 * var(--u))); width: calc(793 * var(--u)); z-index: 1; }
+.pintro__copy { position: absolute; left: calc(53 * var(--u)); top: calc(50% - (48 * var(--u))); z-index: 2; font-size: var(--fs-body); line-height: calc(16 / 13); color: var(--mint); }
+.pintro__more { display: inline-block; margin-top: calc(15 * var(--u)); padding: 0.2em 0; }
+.pintro__more:hover { text-decoration: underline; text-underline-offset: 0.2em; }
+.pintro__price { position: absolute; left: calc(1071 * var(--u)); top: calc(50% + (11 * var(--u))); z-index: 2; display: inline-flex; align-items: center; gap: calc(10 * var(--u)); font-size: var(--fs-body); color: var(--mint); white-space: nowrap; }
+.pintro__price .dot { width: calc(8 * var(--u)); height: calc(8 * var(--u)); min-width: 7px; min-height: 7px; }
+.pintro__line { position: absolute; left: 0; top: calc(50% - (384 * var(--u))); width: 100%; height: calc(768 * var(--u)); z-index: 1; pointer-events: none; }
+.pintro__line path, .pintro__line polyline { fill: none; stroke: var(--mint-2); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
+
+/* =====================================================================
+   HOME · 4 — Layers / Join us (deck p14)
+   Two circular crops of one photo, 420pt wide, centred at x341 / x982.
+   ===================================================================== */
+.layers { min-height: var(--vh); height: max(var(--vh), calc(768 * var(--u))); overflow: hidden; }
+.layers__circle {
+  position: absolute; top: calc(50% - (204 * var(--u)));
+  width: calc(420 * var(--u)); aspect-ratio: 1; border-radius: 50%;
+  background-image: url("product/lounge.webp"); background-repeat: no-repeat;
+  background-size: 253.1% auto;
+}
+.layers__circle::after { content: ""; position: absolute; inset: 0; border-radius: 50%; background: var(--mint); opacity: var(--veil, 1); transition: opacity 0.1s linear; }
+.layers__circle--a { left: calc(131 * var(--u)); background-position: calc(-2 * var(--u)) calc(-697 * var(--u)); }
+.layers__circle--b { left: calc(772 * var(--u)); background-position: calc(-455 * var(--u)) calc(-697 * var(--u)); }
+.layers__copy { position: absolute; left: calc(140 * var(--u)); top: calc(50% + (245 * var(--u))); color: var(--mint); }
+.layers__copy h2 { position: relative; display: inline-block; font-size: var(--fs-md); font-weight: 700; line-height: 1.2; text-transform: uppercase; }
+.layers__copy h2 .red { position: absolute; left: calc(100% + (6 * var(--u))); top: -0.05em; width: calc(8 * var(--u)); height: calc(8 * var(--u)); min-width: 7px; min-height: 7px; border-radius: 50%; background: var(--red); }
+.layers__copy p { font-size: var(--fs-body); line-height: calc(16 / 13); margin-top: calc(2 * var(--u)); }
+.layers__join { position: absolute; left: calc(1089 * var(--u)); top: calc(50% + (265 * var(--u))); color: var(--mint); font-size: var(--fs-body); padding: 0.3em 0; }
+.layers__join:hover { text-decoration: underline; text-underline-offset: 0.2em; }
+
+/* =====================================================================
+   FOOTER
+   ===================================================================== */
+.footer { padding: calc(28 * var(--u)) calc(37 * var(--u)); font-size: var(--fs-nav); line-height: 1.79; text-transform: uppercase; letter-spacing: 0.02em; }
+.footer__row { display: flex; justify-content: space-between; gap: 1.5rem; flex-wrap: wrap; opacity: 0.7; }
+.footer__row a:hover { text-decoration: underline; }
+
+/* =====================================================================
+   DEVICE PAGE (deck p24-41)
+   Every screen: product render centred at the top, copy block at
+   x55 / y429 (heading 25pt, body 13pt grey at +45pt), right column x961.
+   ===================================================================== */
+.dv { min-height: var(--vh); overflow: hidden; }
+.dv--photo { height: calc(478 * var(--u)); min-height: 0; background: #1c1a15; }
+.dv--photo img { width: 100%; height: 100%; object-fit: cover; }
+
+.dv__img { position: absolute; top: 0; left: 50%; transform: translateX(-50%); z-index: 1; }
+.dv__img--future { width: calc(909 * var(--u)); left: calc(662.5 * var(--u)); top: 0; }
+.dv__img--dual   { width: calc(695 * var(--u)); left: calc(668.5 * var(--u)); }
+.dv__img--back   { width: calc(694 * var(--u)); left: calc(683 * var(--u)); }
+.dv__img--front  { width: calc(795 * var(--u)); left: calc(651.5 * var(--u)); top: calc(-65 * var(--u)); }
+.dv__img--top    { width: calc(694 * var(--u)); left: calc(666 * var(--u)); }
+.dv__img--side   { width: calc(695 * var(--u)); left: calc(651.5 * var(--u)); }
+.dv__img--side2  { width: calc(694 * var(--u)); left: calc(683 * var(--u)); }
+.dv__img--angle  { width: calc(694 * var(--u)); left: calc(683 * var(--u)); }
+.dv__img--xray   { width: calc(694 * var(--u)); left: calc(628 * var(--u)); top: calc(-22 * var(--u)); }
+
+.dv__copy { position: absolute; left: calc(55 * var(--u)); top: calc(429 * var(--u)); z-index: 2; max-width: calc(560 * var(--u)); }
+.dv__copy h2, .dv__copy h1, .dv__col h3 { font-size: var(--fs-h); font-weight: 700; line-height: var(--lh); text-transform: uppercase; color: var(--black); letter-spacing: -0.005em; }
+.dv__copy p, .dv__col p { font-size: var(--fs-body); line-height: calc(15.5 / 13); color: var(--grey); font-weight: 500; }
+.dv__copy h2 + p, .dv__col h3 + p { margin-top: calc(15 * var(--u)); }
+.dv__copy p + p { margin-top: calc(15.5 / 13 * 1em); }
+.dv__copy p + h2 { margin-top: calc(14 * var(--u)); }
+.dv__col { position: absolute; left: calc(961 * var(--u)); z-index: 2; max-width: calc(370 * var(--u)); }
+.dv__col--1 { top: calc(143 * var(--u)); }
+.dv__col--2 { top: calc(291 * var(--u)); }
+.dv__col--3 { top: calc(429 * var(--u)); }
+
+/* FUTURE IS HERE (deck p25): 164.9pt, spans x32-x1335, title over the render */
+.dv--future { height: max(var(--vh), calc(768 * var(--u))); }
+.dv__future-title { position: absolute; left: 0; width: 100%; top: calc(349 * var(--u)); z-index: 2; text-align: center; font-size: calc(164.9 * var(--u)); font-weight: 700; line-height: 1.35; letter-spacing: -0.028em; color: var(--black); white-space: nowrap; }
+.dv__future-cta { position: absolute; left: 50%; transform: translateX(-50%); top: calc(570 * var(--u)); z-index: 2; font-size: max(16px, calc(18.4 * var(--u))); font-weight: 700; color: var(--black); white-space: nowrap; padding: 0.3em 0.6em; }
+.dv__future-cta:hover { text-decoration: underline; text-underline-offset: 0.25em; }
+
+/* mint annotations (deck p26/27/34/35/36) */
+.dv__ring { position: absolute; z-index: 2; border-radius: 50%; border: calc(10 * var(--u)) solid var(--mint-2); width: calc(97 * var(--u)); height: calc(97 * var(--u)); pointer-events: none; }
+.dv__ring--l { left: calc(468 * var(--u)); top: calc(193 * var(--u)); }
+.dv__ring--r { left: calc(804 * var(--u)); top: calc(193 * var(--u)); }
+.dv__sq { position: absolute; z-index: 2; left: calc(709 * var(--u)); width: calc(147 * var(--u)); height: calc(129 * var(--u)); border: calc(10 * var(--u)) solid var(--mint-2); pointer-events: none; }
+.dv__sq::after { content: ""; position: absolute; left: 50%; top: 50%; width: calc(97 * var(--u)); height: calc(97 * var(--u)); transform: translate(-50%, -50%); border-radius: 50%; border: calc(10 * var(--u)) solid var(--mint-2); }
+.dv__sq--1 { top: calc(171 * var(--u)); }
+.dv__sq--2 { top: calc(340 * var(--u)); }
+.dv__mount { position: absolute; z-index: 2; left: calc(616 * var(--u)); top: calc(173 * var(--u)); width: calc(133 * var(--u)); height: calc(133 * var(--u)); border-radius: 50%; border: calc(10 * var(--u)) solid var(--mint-2); pointer-events: none; }
+.dv__mount::after { content: ""; position: absolute; left: 50%; top: 50%; width: calc(97 * var(--u)); height: calc(97 * var(--u)); transform: translate(-50%, -50%); border-radius: 50%; background: var(--mint-2); }
+.dv__wall { position: absolute; z-index: 2; left: calc(440 * var(--u)); top: calc(51 * var(--u)); width: calc(6 * var(--u)); height: calc(529 * var(--u)); background: var(--mint-2); }
+.dv__shelf { position: absolute; z-index: 2; left: calc(419 * var(--u)); top: calc(520 * var(--u)); width: calc(528 * var(--u)); height: calc(6 * var(--u)); background: var(--mint-2); }
+.dv__glowb { position: absolute; z-index: 0; left: 50%; bottom: calc(-140 * var(--u)); width: calc(520 * var(--u)); height: calc(320 * var(--u)); transform: translateX(-30%); border-radius: 50%; background: radial-gradient(ellipse at center, rgba(162,228,184,0.85), rgba(162,228,184,0) 70%); filter: blur(calc(18 * var(--u))); pointer-events: none; }
+
+/* rotation scrub (deck p29-32): sticky stage, 5 renders, a mint glow that travels */
+.dv--rot { height: calc(4 * var(--vh)); min-height: 0; overflow: visible; }
+.dv__stage { position: sticky; top: 0; height: var(--vh); overflow: hidden; background: var(--white); }
+.dv__rot-img { position: absolute; top: calc(-65 * var(--u)); left: calc(651.5 * var(--u)); width: calc(795 * var(--u)); transform: translateX(-50%); opacity: 0; will-change: opacity; }
+.dv__rot-img:first-child { opacity: 1; }
+.dv__glow { position: absolute; left: 0; top: 0; width: calc(360 * var(--u)); height: calc(360 * var(--u)); border-radius: 50%; margin: calc(-180 * var(--u)) 0 0 calc(-180 * var(--u)); background: radial-gradient(circle, rgba(162,228,184,0.95), rgba(162,228,184,0) 68%); filter: blur(calc(14 * var(--u))); will-change: transform; pointer-events: none; }
+
+/* =====================================================================
+   ORDER PAGE (deck p15-22)
+   Stage 981x594 at (37,149) in #eaeaea, panel column at x1089.
+   ===================================================================== */
+.order { min-height: var(--vh); height: max(var(--vh), calc(768 * var(--u))); }
+.order__stage { position: absolute; left: calc(37 * var(--u)); top: calc(149 * var(--u)); width: calc(981 * var(--u)); height: calc(594 * var(--u)); background: var(--stage); overflow: hidden; }
+.order__view { position: absolute; inset: 0; opacity: 0; visibility: hidden; transition: opacity 0.45s var(--ease), visibility 0.45s; }
+.order__view.is-on { opacity: 1; visibility: visible; }
+
+.order__slides { position: absolute; inset: 0; }
+.order__slide { position: absolute; left: 50%; top: 50%; width: calc(560 * var(--u)); transform: translate(-50%, -50%); opacity: 0; transition: opacity 0.5s var(--ease); }
+.order__slide.is-on { opacity: 1; }
+.order__dots { position: absolute; left: 0; right: 0; top: calc(566 * var(--u)); display: flex; justify-content: center; gap: calc(9 * var(--u)); }
+.order__dots button { width: calc(8 * var(--u)); height: calc(8 * var(--u)); min-width: 7px; min-height: 7px; border-radius: 50%; background: var(--dot-off); padding: 0; transition: background 0.3s var(--ease); }
+.order__dots button.is-on { background: var(--mint-2); }
+.order__chev { position: absolute; top: 50%; width: calc(28 * var(--u)); height: calc(40 * var(--u)); min-width: 22px; min-height: 30px; transform: translateY(-50%); color: var(--mint-2); display: grid; place-items: center; }
+.order__chev svg { width: 55%; height: auto; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.order__chev--prev { left: calc(100 * var(--u)); }
+.order__chev--next { right: calc(100 * var(--u)); }
+
+.order__faq { position: absolute; left: calc(195 * var(--u)); top: calc(43 * var(--u)); right: calc(60 * var(--u)); font-size: var(--fs-md); font-weight: 500; color: var(--ink); }
+.faq__item { position: relative; }
+.faq__q { display: flex; align-items: center; gap: calc(14 * var(--u)); width: 100%; text-align: left; padding: 0; line-height: 1.28; }
+.faq__q::after { content: ""; width: calc(17 * var(--u)); height: calc(17 * var(--u)); min-width: 10px; min-height: 10px; border-radius: 50%; background: var(--mint-2); opacity: 0; transition: opacity 0.25s var(--ease); }
+.faq__q:hover::after, .faq__item.is-open .faq__q::after { opacity: 1; }
+.faq__a { max-height: 0; overflow: hidden; transition: max-height 0.45s var(--ease); line-height: 1.28; color: var(--ink); }
+.faq__a p { padding: 0 0 calc(31 * var(--u)); }
+.faq__item.is-open .faq__a { max-height: 20em; }
+
+.order__details { position: absolute; inset: 0; }
+.order__grid { position: absolute; left: calc(124 * var(--u)); top: calc(53 * var(--u)); width: calc(733 * var(--u)); display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: calc(153 * var(--u)) calc(306 * var(--u)); gap: calc(12 * var(--u)) calc(11 * var(--u)); }
+.order__cell { background: var(--box); padding: calc(10 * var(--u)) calc(13 * var(--u)); font-size: var(--fs-md); font-weight: 500; color: var(--ink); }
+.order__subtabs { position: absolute; left: calc(397 * var(--u)); top: calc(564 * var(--u)); display: flex; gap: calc(35 * var(--u)); font-size: var(--fs-nav); font-weight: 500; }
+.order__subtabs button { opacity: 0.45; padding: 0.2em 0; }
+.order__subtabs button.is-on { opacity: 1; }
+.order__need { position: absolute; right: calc(124 * var(--u)); top: calc(564 * var(--u)); font-size: var(--fs-nav); font-weight: 500; color: var(--ink-2); padding: 0.2em 0; }
+
+.order__panel { position: absolute; left: calc(1089 * var(--u)); top: calc(288 * var(--u)); width: calc(178 * var(--u)); color: var(--ink); }
+.order__name { font-size: var(--fs-md); font-weight: 700; line-height: 1.2; text-transform: uppercase; }
+.order__sub { font-size: var(--fs-body); font-weight: 700; line-height: 1.2; }
+.order__tabs { display: flex; gap: calc(42 * var(--u)); margin-top: calc(15 * var(--u)); font-size: var(--fs-nav); font-weight: 500; }
+.order__tabs button { position: relative; opacity: 0.45; padding: 0.2em 0; transition: opacity 0.3s var(--ease); }
+.order__tabs button.is-on, .order__tabs button:hover { opacity: 1; }
+.order__tabs button.is-on::before { content: ""; position: absolute; left: -2.25em; top: 50%; width: 1em; height: 1em; border-radius: 50%; background: var(--mint-2); transform: translateY(-50%); }
+.order__swatches { display: flex; align-items: center; gap: calc(22 * var(--u)); margin-top: calc(18 * var(--u)); }
+.order__swatch { position: relative; width: calc(17 * var(--u)); height: calc(17 * var(--u)); min-width: 14px; min-height: 14px; border-radius: 50%; background: var(--stage); }
+.order__swatch.is-on::after { content: ""; position: absolute; inset: calc(-3 * var(--u)); border-radius: 50%; border: 1px solid var(--mint-2); }
+.order__swatch-label { font-size: var(--fs-nav); font-weight: 500; opacity: 0.7; }
+.order__buy { display: inline-block; margin: calc(19 * var(--u)) 0 0 calc(-4 * var(--u)); padding: calc(1 * var(--u)) calc(4 * var(--u)); font-size: var(--fs-body); font-weight: 700; background: var(--stage); transition: background 0.3s var(--ease); }
+.order__buy:hover { background: var(--mint-2); }
+.order__how { display: block; text-align: right; margin-top: calc(18 * var(--u)); font-size: var(--fs-nav); font-weight: 700; }
+.order__how:hover { text-decoration: underline; }
+
+.ship { margin-top: calc(22 * var(--u)); display: none; }
+.ship.is-on { display: block; }
+.ship h3 { font-size: var(--fs-body); font-weight: 700; text-transform: uppercase; }
+.ship__row { display: grid; grid-template-columns: 1fr; gap: 0 calc(12 * var(--u)); margin-top: calc(12 * var(--u)); }
+.ship__row--2 { grid-template-columns: 1fr 1fr; }
+.ship label { display: block; font-size: var(--fs-nav); font-weight: 700; }
+.ship input, .ship select { display: block; width: 100%; margin-top: 0.2em; padding: 0.35em 0; border: 0; border-bottom: 1px solid rgba(0,0,0,0.18); background: transparent; font-size: var(--fs-nav); font-weight: 500; border-radius: 0; }
+.ship input:focus, .ship select:focus { outline: none; border-bottom-color: var(--mint-2); }
+.ship__note { margin-top: calc(14 * var(--u)); font-size: var(--fs-nav); opacity: 0.5; }
+.ship__submit { display: inline-flex; align-items: center; gap: calc(12 * var(--u)); margin-top: calc(12 * var(--u)); font-size: var(--fs-nav); font-weight: 700; padding: 0.2em 0; }
+.ship__submit .dot { width: calc(8 * var(--u)); height: calc(8 * var(--u)); min-width: 7px; min-height: 7px; background: var(--mint-2); }
+.ship__done { margin-top: calc(14 * var(--u)); font-size: var(--fs-nav); color: var(--ink); display: none; }
+.ship.is-sent .ship__done { display: block; }
+.ship.is-sent form { display: none; }
+
+.order__acc { position: absolute; inset: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: calc(12 * var(--u)); padding: calc(53 * var(--u)) calc(124 * var(--u)); align-content: start; }
+.order__acc .order__cell { aspect-ratio: 1; display: flex; flex-direction: column; justify-content: space-between; }
+.order__acc .order__cell span { font-size: var(--fs-nav); font-weight: 500; opacity: 0.7; }
+
+/* =====================================================================
+   LIBRARY PAGE (deck p42-44)
+   ===================================================================== */
+.lib { min-height: var(--vh); height: calc(1160 * var(--u)); overflow: hidden; color: var(--ink); }
+.lib h1, .lib h2, .lib__rooms button, .lib__order { font-size: var(--fs-h); font-weight: 700; line-height: var(--lh); text-transform: uppercase; color: var(--black); }
+.lib__intro { position: absolute; left: calc(55 * var(--u)); top: calc(148 * var(--u)); max-width: calc(380 * var(--u)); }
+.lib__intro p { font-size: var(--fs-body); line-height: calc(15.5 / 13); color: var(--grey); }
+.lib__intro h1 + p { margin-top: calc(16 * var(--u)); }
+.lib__intro p + p { margin-top: calc(15.5 / 13 * 1em); }
+.lib__search { position: absolute; left: calc(438 * var(--u)); top: calc(148 * var(--u)); display: flex; align-items: center; gap: calc(10 * var(--u)); }
+.lib__search h2 { cursor: pointer; }
+.lib__search-btn { width: calc(24 * var(--u)); height: calc(24 * var(--u)); min-width: 18px; min-height: 18px; display: grid; place-items: center; color: var(--black); }
+.lib__search-btn svg { width: 100%; height: 100%; fill: none; stroke: currentColor; stroke-width: 3; stroke-linecap: round; vector-effect: non-scaling-stroke; }
+.lib__search-field { display: none; align-items: center; gap: calc(8 * var(--u)); margin-left: calc(4 * var(--u)); }
+.lib__search.is-open .lib__search-field { display: flex; }
+.lib__search-field .dot { width: calc(17 * var(--u)); height: calc(17 * var(--u)); min-width: 10px; min-height: 10px; background: var(--mint-2); }
+.lib__search-field input { width: calc(393 * var(--u)); min-width: 160px; border: 0; border-bottom: 3px solid var(--black); background: transparent; font-size: var(--fs-body); padding: 0.2em 0; border-radius: 0; }
+.lib__search-field input:focus { outline: none; border-bottom-color: var(--mint-2); }
+.lib__order { position: absolute; right: calc(39 * var(--u)); top: calc(148 * var(--u)); text-align: right; white-space: nowrap; }
+.lib__order:hover { text-decoration: underline; text-underline-offset: 0.2em; }
+.lib__rooms { position: absolute; left: calc(55 * var(--u)); top: calc(313 * var(--u)); list-style: none; }
+.lib__rooms button { display: block; text-align: left; line-height: calc(28.3 / 25); opacity: 0.35; transition: opacity 0.3s var(--ease); }
+.lib__rooms button.is-on, .lib__rooms button:hover { opacity: 1; }
+.lib__scenes { position: absolute; left: calc(55 * var(--u)); top: calc(437 * var(--u)); list-style: none; font-size: var(--fs-body); line-height: calc(15.6 / 13); color: var(--grey); }
+.lib__scenes button { display: inline-flex; align-items: center; gap: calc(6 * var(--u)); text-align: left; color: inherit; line-height: inherit; }
+.lib__scenes button.is-on { color: var(--black); }
+.lib__scenes button::after { content: ""; width: calc(8 * var(--u)); height: calc(8 * var(--u)); min-width: 6px; min-height: 6px; border-radius: 50%; background: var(--mint-2); opacity: 0; }
+.lib__scenes button.is-on::after { opacity: 1; }
+.lib__lounge { position: absolute; left: calc(55 * var(--u)); top: calc(587 * var(--u)); }
+.lib__video { position: absolute; left: calc(439 * var(--u)); top: calc(316 * var(--u)); width: calc(648 * var(--u)); height: calc(327 * var(--u)); background: var(--box); overflow: hidden; }
+.lib__video img, .lib__video video { width: 100%; height: 100%; object-fit: cover; }
+.lib__video img { filter: saturate(0.85); }
+.lib__play { position: absolute; inset: 0; display: grid; place-items: center; color: var(--white); }
+.lib__play svg { width: calc(76 * var(--u)); min-width: 40px; height: auto; fill: currentColor; filter: drop-shadow(0 2px 12px rgba(0,0,0,0.25)); }
+.lib__video.is-playing .lib__play, .lib__video.is-playing img { display: none; }
+.lib__circle { position: absolute; top: calc(677 * var(--u)); width: calc(420 * var(--u)); aspect-ratio: 1; border-radius: 50%; background-image: url("product/lounge.webp"); background-repeat: no-repeat; background-size: 253.1% auto; }
+.lib__circle--a { left: calc(131 * var(--u)); background-position: calc(-2 * var(--u)) calc(-697 * var(--u)); }
+.lib__circle--b { left: calc(772 * var(--u)); background-position: calc(-455 * var(--u)) calc(-697 * var(--u)); }
+
+/* =====================================================================
+   SIMPLE PAGES (wiki / careers)
+   ===================================================================== */
+.simple { min-height: var(--vh); }
+.simple__copy { position: absolute; left: calc(55 * var(--u)); top: calc(429 * var(--u)); max-width: calc(560 * var(--u)); }
+.simple__copy h1 { font-size: var(--fs-h); font-weight: 700; line-height: var(--lh); text-transform: uppercase; color: var(--black); }
+.simple__copy p { font-size: var(--fs-body); line-height: calc(15.5 / 13); color: var(--grey); margin-top: calc(15 * var(--u)); }
+.simple__copy a { color: var(--black); }
+.simple__copy a:hover { text-decoration: underline; }
+
+/* ---------- reveal ---------- */
+[data-reveal] { opacity: 0; transform: translateY(18px); transition: opacity 0.9s var(--ease), transform 0.9s var(--ease); }
+[data-reveal].is-in { opacity: 1; transform: none; }
+
+/* =====================================================================
+   RESPONSIVE — the deck is desktop-only; below 760px the fixed deck
+   coordinates are replaced by a stacked flow with fixed pixel type.
+   ===================================================================== */
+@media (max-width: 760px) {
+  :root { --fs-nav: 10px; --fs-body: 14px; --fs-md: 17px; --fs-h: 24px; }
+  .nav__brand { left: 20px; top: 22px; width: 32px; height: 13.3px; }
+  .nav__maker { right: 20px; top: 22px; width: 90px; height: 13.1px; }
+  .nav__menu { left: 46%; top: 20px; }
+  .nav__sub { margin-left: 2.4em; }
+
+  .intro { font-size: 15px; }
+  .film__cap--a { left: 20px; right: 20px; top: 24vh; max-width: none; }
+  .film__cap--b { top: auto; bottom: 14vh; }
+
+  .pintro { display: flex; flex-direction: column; justify-content: center; gap: 22px; padding: 90px 20px 60px; height: auto; }
+  .pintro__device { position: static; width: 82%; margin: 0 auto; }
+  .pintro__copy, .pintro__price { position: static; }
+  .pintro__line { display: none; }
+
+  .layers { display: flex; flex-direction: column; justify-content: center; padding: 80px 20px 60px; gap: 22px; height: auto; }
+  .layers__circles { display: flex; gap: 12px; }
+  .layers__circle { position: static; width: 50%; }
+  .layers__copy, .layers__join { position: static; }
+
+  .footer { padding: 24px 20px; }
+
+  .dv { min-height: 0; padding: 0 20px 56px; }
+  .dv--photo { height: 48vh; padding: 0; }
+  .dv__img, .dv__img--future, .dv__img--dual, .dv__img--back, .dv__img--front, .dv__img--top, .dv__img--side, .dv__img--side2, .dv__img--angle, .dv__img--xray { position: relative; left: auto; top: auto; transform: none; width: 92%; margin: 40px auto 0; }
+  .dv__copy, .dv__col { position: static; max-width: none; margin-top: 18px; }
+  .dv--future { height: auto; padding-top: 80px; text-align: center; }
+  .dv--future .dv__img--future { margin-top: 0; }
+  .dv__future-title { position: static; font-size: 12.6vw; margin-top: -8vw; }
+  .dv__future-cta { position: static; transform: none; display: inline-block; margin-top: 8px; }
+  .dv__ring, .dv__sq, .dv__mount, .dv__wall, .dv__shelf, .dv__glowb { display: none; }
+  .dv--rot { height: auto; padding: 0; }
+  .dv__stage { position: relative; height: auto; padding: 40px 20px; }
+  .dv__rot-img { position: relative; left: auto; top: auto; transform: none; width: 92%; margin: 0 auto; display: none; }
+  .dv__rot-img:first-child { display: block; opacity: 1; }
+  .dv__glow { display: none; }
+
+  .order { height: auto; padding: 90px 16px 40px; }
+  .order__stage { position: relative; left: auto; top: auto; width: 100%; height: auto; aspect-ratio: 981 / 594; }
+  .order__slide { width: 70%; }
+  .order__faq { left: 16px; right: 16px; top: 16px; font-size: 14px; }
+  .order__grid { left: 16px; top: 16px; width: calc(100% - 32px); grid-template-rows: 1fr 2fr; height: 70%; }
+  .order__subtabs { left: 16px; top: auto; bottom: 14px; }
+  .order__need { right: 16px; top: auto; bottom: 14px; }
+  .order__panel { position: static; width: auto; margin-top: 28px; }
+  .order__acc { padding: 16px; }
+
+  .lib { height: auto; padding: 100px 20px 60px; }
+  .lib__intro, .lib__search, .lib__order, .lib__rooms, .lib__scenes, .lib__lounge, .lib__video, .lib__circle { position: static; max-width: none; }
+  .lib__search { margin-top: 28px; }
+  .lib__search-field input { width: 100%; }
+  .lib__order { margin-top: 28px; text-align: left; white-space: normal; display: block; }
+  .lib__rooms { margin-top: 36px; }
+  .lib__scenes { margin-top: 14px; }
+  .lib__lounge { margin-top: 28px; display: block; }
+  .lib__video { width: 100%; height: auto; aspect-ratio: 648 / 327; margin-top: 28px; }
+  .lib__circles { display: flex; gap: 12px; margin-top: 36px; }
+  .lib__circle { width: 50%; }
+
+  .simple { padding: 120px 20px 60px; }
+  .simple__copy { position: static; max-width: none; }
+}
+
+/* ---------- reduced motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal] { opacity: 1; transform: none; transition: none; }
+  .film__hint { animation: none; }
+  .nav { transition: none; }
+}
