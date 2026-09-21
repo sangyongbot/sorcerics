@@ -205,7 +205,7 @@
         // Captions travel upward through the frame as you scroll (Scout-style).
         const tA = clamp((p - 0.06) / 0.52, 0, 1), a = band(p, 0.06, 0.14, 0.48, 0.58);
         const tB = clamp((p - 0.66) / 0.34, 0, 1), b = band(p, 0.66, 0.76, 2, 3);
-        if (capA) { capA.style.opacity = a; capA.style.transform = `translateY(${((0.5 - tA) * H * 0.5).toFixed(1)}px)`; }
+        if (capA) { capA.style.opacity = a; capA.style.transform = `translateY(${((1 - tA) * H * 0.3).toFixed(1)}px)`; }   // rises from 30% below to its deck position, fades there
         if (capB) { capB.style.opacity = b; capB.style.transform = `translate(-50%, ${((1 - tB) * H * 0.3).toFixed(1)}px)`; }
         if (trackFill) trackFill.style.transform = `scaleY(${p.toFixed(4)})`;
         if (trackDot && track) trackDot.style.transform = `translate(-50%, calc(${(p * track.clientHeight).toFixed(1)}px - 50%))`;
