@@ -105,6 +105,11 @@ section { position: relative; }
 .nav__brand { left: calc(36.4 * var(--u)); width: calc(22.2 * var(--u)); }
 .nav__maker { right: calc(38.4 * var(--u)); width: calc(63.2 * var(--u)); }
 
+/* HOME 1 / HOME 2 switch, to the right of the SOL wordmark */
+.nav__home { position: absolute; left: calc(74 * var(--u)); top: calc(33.9 * var(--u)); display: flex; align-items: baseline; font-size: var(--fs-nav); line-height: 1.79; font-weight: 500; letter-spacing: 0.01em; text-transform: uppercase; white-space: nowrap; }
+.nav__home a { opacity: 0.5; transition: opacity 0.3s var(--ease); }
+.nav__home a:hover, .nav__home a:focus-visible, .nav__home a.is-active { opacity: 1; }
+
 .nav__menu {
   position: absolute; left: calc(659 * var(--u)); top: calc(35 * var(--u));
   display: flex; flex-direction: column; align-items: flex-start;
@@ -170,6 +175,11 @@ section { position: relative; }
 .film__cap--a { left: calc(923 * var(--u)); top: calc(165 * var(--u)); max-width: calc(420 * var(--u)); }
 .film__cap--b { left: 50%; top: calc(650 * var(--u)); transform: translateX(-50%); white-space: nowrap; }
 .film__cap a { display: inline-block; padding: 0.4em 0; }
+/* HOME 2: vertical progress track (right edge) — fill grows and the dot travels
+   downward with the scrub, so the scroll direction is always visible. */
+.film__track { position: absolute; right: calc(38.4 * var(--u)); top: 50%; width: 1px; height: 36vh; transform: translateY(-50%); background: rgba(162,228,184,0.3); }
+.film__track-fill { position: absolute; left: 0; top: 0; width: 100%; height: 100%; background: var(--mint); transform: scaleY(0); transform-origin: top center; }
+.film__track-dot { position: absolute; left: 50%; top: 0; width: calc(8 * var(--u)); height: calc(8 * var(--u)); min-width: 7px; min-height: 7px; border-radius: 50%; background: var(--mint); transform: translate(-50%, -50%); box-shadow: 0 0 0 calc(3 * var(--u)) rgba(0,0,0,0.28); }
 .film__hint { position: absolute; left: 50%; bottom: calc(28 * var(--u)); transform: translateX(-50%); width: 1px; height: calc(34 * var(--u)); background: var(--mint); opacity: 0.8; transform-origin: top; animation: hintPulse 2s var(--ease) infinite; }
 @keyframes hintPulse { 0% { transform: translateX(-50%) scaleY(0); opacity: 0; } 40% { transform: translateX(-50%) scaleY(1); opacity: 0.8; } 100% { transform: translateX(-50%) scaleY(1); opacity: 0; } }
 
@@ -459,11 +469,13 @@ main.fit > .footer { flex: 0 0 auto; }
   .nav__brand { left: 20px; top: 22px; width: 32px; height: 13.3px; }
   .nav__maker { right: 20px; top: 22px; width: 90px; height: 13.1px; }
   .nav__menu { left: 46%; top: 20px; }
+  .nav__home { left: 64px; top: 19px; }
   .nav__sub { margin-left: 2.4em; }
 
   .intro { font-size: 15px; }
   .film__cap--a { left: 20px; right: 20px; top: 24vh; max-width: none; }
   .film__cap--b { top: auto; bottom: 14vh; }
+  .film__track { right: 16px; height: 30vh; }
 
   .pintro { height: auto; }
   .pintro__sticky { position: static; height: auto; display: flex; flex-direction: column; justify-content: center; gap: 22px; padding: 90px 20px 60px; }

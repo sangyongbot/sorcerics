@@ -45,7 +45,7 @@
      1:1 with the first scroll until it reaches its top position, where
      it stays fixed (sticky behaviour without leaving the root context).
      ------------------------------------------------------------------ */
-  const navCtl = { shift0: 0, ride: page === "home", raf: 0 };
+  const navCtl = { shift0: 0, ride: page.startsWith("home"), raf: 0 };
   const themed = $$("[data-theme]");
 
   function measureNav() {
@@ -83,7 +83,7 @@
     const intro = $("#intro");
     if (!intro) { done(); return; }
     const textEl = $("#introText"), dot = $("#introDot");
-    const brand = $(".nav__brand", nav), maker = $(".nav__maker", nav), menu = $(".nav__menu", nav);
+    const brand = $(".nav__brand", nav), maker = $(".nav__maker", nav), menu = [$(".nav__menu", nav), $(".nav__home", nav)].filter(Boolean);
     if (!hasGsap || reduced) { intro.classList.add("is-done"); done(); return; }
 
     const W = window.innerWidth, u = W / 1366;
@@ -112,7 +112,7 @@
       finished = true;
       intro.classList.add("is-done");
       nav.classList.remove("is-intro");
-      gsap.set([brand, maker, menu], { clearProps: "transform,opacity,visibility" });
+      gsap.set([brand, maker, ...menu], { clearProps: "transform,opacity,visibility" });
       html.classList.remove("is-locked");
       if (lenis) lenis.start();
       window.removeEventListener("wheel", skip);
@@ -124,16 +124,17 @@
       done();
     };
     const tl = gsap.timeline({ paused: true, onComplete: finish });
-    tl.fromTo(dot, { autoAlpha: 0, scale: 0.3 }, { autoAlpha: 1, scale: 1, duration: 0.55, ease: "power2.out" }, 0.2)
-      .to(typer, { n: text.length, duration: 1.25, ease: "none",
-        onUpdate: () => { textEl.textContent = text.slice(0, Math.round(typer.n)); } }, 0.8)
-      .to(dot, { autoAlpha: 0, duration: 0.3 }, 2.35)
-      .to(textEl, { autoAlpha: 0, duration: 0.45, ease: "power2.in" }, 2.55)
-      .to(brand, { autoAlpha: 1, duration: 0.5, ease: "power2.out" }, 2.7)
-      .to(brand, { x: xPairBrand, duration: 0.55, ease: "power3.inOut" }, 3.3)
-      .to(maker, { autoAlpha: 1, duration: 0.45, ease: "power2.out" }, 3.4)
-      .to([brand, maker], { x: 0, duration: 0.95, ease: "expo.inOut" }, 4.05)
-      .to(menu, { autoAlpha: 1, duration: 0.6, ease: "power2.out" }, 4.55);
+    // ~3 s total ("short and snappy", per the designer)
+    tl.fromTo(dot, { autoAlpha: 0, scale: 0.3 }, { autoAlpha: 1, scale: 1, duration: 0.3, ease: "power2.out" }, 0.1)
+      .to(typer, { n: text.length, duration: 0.8, ease: "none",
+        onUpdate: () => { textEl.textContent = text.slice(0, Math.round(typer.n)); } }, 0.45)
+      .to(dot, { autoAlpha: 0, duration: 0.2 }, 1.35)
+      .to(textEl, { autoAlpha: 0, duration: 0.3, ease: "power2.in" }, 1.45)
+      .to(brand, { autoAlpha: 1, duration: 0.35, ease: "power2.out" }, 1.55)
+      .to(brand, { x: xPairBrand, duration: 0.35, ease: "power3.inOut" }, 1.95)
+      .to(maker, { autoAlpha: 1, duration: 0.3, ease: "power2.out" }, 2.0)
+      .to([brand, maker], { x: 0, duration: 0.6, ease: "expo.inOut" }, 2.35)
+      .to(menu, { autoAlpha: 1, duration: 0.4, ease: "power2.out" }, 2.6);
 
     const skip = () => { if (!finished) tl.progress(1); };
     window.addEventListener("wheel", skip, { passive: true });
@@ -152,7 +153,9 @@
     const canvas = $("#frameCanvas");
     if (!canvas) return null;
     const sticky = $("#filmSticky"), capA = $("#capA"), capB = $("#capB"), hint = $("#filmHint");
-    const TOTAL = 120, CONC = 8;
+    const TOTAL = 240, CONC = 8;
+    const vertical = page === "home2";   // HOME 2: vertical progression cues
+    const track = $("#filmTrack"), trackFill = $("#filmTrackFill"), trackDot = $("#filmTrackDot");
     const small = window.innerWidth < 700 || window.innerWidth * (window.devicePixelRatio || 1) < 900;
     const dir = small ? "frames/sm" : "frames";
     const src = (i) => `${dir}/frame_${String(i + 1).padStart(4, "0")}.webp`;
@@ -167,10 +170,15 @@
       canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr);
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     }
+    let prog = 0;
     function cover(img) {
-      const s = Math.max(W / img.naturalWidth, H / img.naturalHeight);
+      // HOME 2: the frame is drawn 8% larger and drifts upward with scroll, so
+      // the scene itself moves in the scroll direction (scroll down -> up).
+      const zoom = vertical ? 1.08 : 1;
+      const s = Math.max(W / img.naturalWidth, H / img.naturalHeight) * zoom;
       const w = img.naturalWidth * s, h = img.naturalHeight * s;
-      ctx.drawImage(img, (W - w) / 2, (H - h) / 2, w, h);
+      const dy = vertical ? (0.5 - prog) * H * 0.08 : 0;
+      ctx.drawImage(img, (W - w) / 2, (H - h) / 2 + dy, w, h);
     }
     function nearest(i) {
       if (ok[i]) return i;
@@ -183,7 +191,7 @@
     function draw(i) {
       target = clamp(Math.round(i), 0, TOTAL - 1);
       const j = nearest(target);
-      if (j < 0 || j === drawn) return;
+      if (j < 0 || (j === drawn && !vertical)) return;
       cover(imgs[j]); drawn = j;
     }
     function band(p, a, b, c, d) {
@@ -193,12 +201,22 @@
       return 1;
     }
     function overlay(p) {
-      const a = band(p, 0.08, 0.16, 0.5, 0.6), b = band(p, 0.7, 0.8, 2, 3);
-      if (capA) { capA.style.opacity = a; capA.style.transform = `translateY(${((1 - a) * 14).toFixed(1)}px)`; }
-      if (capB) { capB.style.opacity = b; capB.style.transform = `translate(-50%, ${((1 - b) * 14).toFixed(1)}px)`; }
+      if (vertical) {
+        // Captions travel upward through the frame as you scroll (Scout-style).
+        const tA = clamp((p - 0.06) / 0.52, 0, 1), a = band(p, 0.06, 0.14, 0.48, 0.58);
+        const tB = clamp((p - 0.66) / 0.34, 0, 1), b = band(p, 0.66, 0.76, 2, 3);
+        if (capA) { capA.style.opacity = a; capA.style.transform = `translateY(${((0.5 - tA) * H * 0.5).toFixed(1)}px)`; }
+        if (capB) { capB.style.opacity = b; capB.style.transform = `translate(-50%, ${((1 - tB) * H * 0.3).toFixed(1)}px)`; }
+        if (trackFill) trackFill.style.transform = `scaleY(${p.toFixed(4)})`;
+        if (trackDot && track) trackDot.style.transform = `translate(-50%, calc(${(p * track.clientHeight).toFixed(1)}px - 50%))`;
+      } else {
+        const a = band(p, 0.08, 0.16, 0.5, 0.6), b = band(p, 0.7, 0.8, 2, 3);
+        if (capA) { capA.style.opacity = a; capA.style.transform = `translateY(${((1 - a) * 14).toFixed(1)}px)`; }
+        if (capB) { capB.style.opacity = b; capB.style.transform = `translate(-50%, ${((1 - b) * 14).toFixed(1)}px)`; }
+      }
       if (hint) hint.style.opacity = p > 0.02 ? 0 : 1;
     }
-    function render() { draw(st.frame); overlay(st.frame / (TOTAL - 1)); }
+    function render() { prog = st.frame / (TOTAL - 1); draw(st.frame); overlay(prog); }
     function load(i) {
       return new Promise((res) => {
         if (imgs[i]) { res(ok[i]); return; }
@@ -232,7 +250,7 @@
     if (film) {
       gsap.to(film.st, {
         frame: film.TOTAL - 1, ease: "none", onUpdate: film.render,
-        scrollTrigger: { trigger: "#film", start: "top top", end: "bottom bottom", scrub: 0.6 },
+        scrollTrigger: { trigger: "#film", start: "top top", end: "bottom bottom", scrub: 0.8 },
       });
     }
 
@@ -456,7 +474,7 @@
       setupStatic(film);
     }
 
-    if (page === "home") setupIntro(() => {});
+    if (page.startsWith("home")) setupIntro(() => {});
     document.body.classList.add("is-ready");
   }
 
