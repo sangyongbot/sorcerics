@@ -118,6 +118,11 @@ section { position: relative; }
   border-radius: 50%; background: var(--mint); transform: translateY(-50%);
 }
 .nav__row { display: flex; align-items: flex-start; }
+.nav__row--inline { position: relative; align-items: baseline; }
+.nav__sep { opacity: 0.5; margin: 0 0.5em; }
+.nav__row.is-active::before { content: ""; position: absolute; left: -2.875em; top: 0.9em; width: 1em; height: 1em; border-radius: 50%; background: var(--mint); transform: translateY(-50%); }
+.nav__row a.is-active::before { display: none; }
+.nav__menu a.is-hint, .nav__row.is-hint a { opacity: 1; }
 .nav__sub { display: flex; flex-direction: column; margin-left: 4em; }
 .nav__sub a { opacity: 0.5; }
 .nav__sub a.is-active { opacity: 1; }
@@ -171,15 +176,22 @@ section { position: relative; }
 /* =====================================================================
    HOME · 3 — Product intro (deck p10-13)
    ===================================================================== */
-.pintro { min-height: var(--vh); height: max(var(--vh), calc(768 * var(--u))); overflow: hidden; }
-.pintro__device { position: absolute; left: calc(171 * var(--u)); top: calc(50% - (297 * var(--u))); width: calc(793 * var(--u)); z-index: 1; }
-.pintro__copy { position: absolute; left: calc(53 * var(--u)); top: calc(50% - (48 * var(--u))); z-index: 2; font-size: var(--fs-body); line-height: calc(16 / 13); color: var(--mint); }
-.pintro__more { display: inline-block; margin-top: calc(15 * var(--u)); padding: 0.2em 0; }
-.pintro__more:hover { text-decoration: underline; text-underline-offset: 0.2em; }
-.pintro__price { position: absolute; left: calc(1071 * var(--u)); top: calc(50% + (11 * var(--u))); z-index: 2; display: inline-flex; align-items: center; gap: calc(10 * var(--u)); font-size: var(--fs-body); color: var(--mint); white-space: nowrap; }
-.pintro__price .dot { width: calc(8 * var(--u)); height: calc(8 * var(--u)); min-width: 7px; min-height: 7px; }
-.pintro__line { position: absolute; left: 0; top: calc(50% - (384 * var(--u))); width: 100%; height: calc(768 * var(--u)); z-index: 1; pointer-events: none; }
-.pintro__line path, .pintro__line polyline { fill: none; stroke: var(--mint-2); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
+.pintro { height: calc(3 * var(--vh)); }
+.pintro__sticky { position: sticky; top: 0; height: var(--vh); overflow: hidden; }
+.pintro__device { position: absolute; left: calc(171 * var(--u)); top: calc(149 * var(--u)); width: calc(793 * var(--u)); z-index: 1; }
+.pintro__copy { position: absolute; left: calc(53 * var(--u)); top: calc(336 * var(--u)); z-index: 2; font-size: var(--fs-body); line-height: calc(16 / 13); color: var(--mint); }
+.pintro__more, .pintro__price { position: absolute; z-index: 2; display: inline-flex; align-items: center; gap: calc(9 * var(--u)); font-size: var(--fs-body); line-height: calc(16 / 13); color: var(--mint); white-space: nowrap; }
+.pintro__more { left: calc(37 * var(--u)); top: calc(399 * var(--u)); }
+.pintro__price { left: calc(1071 * var(--u)); top: calc(395 * var(--u)); }
+.pintro__more .dot, .pintro__price .dot { width: calc(8 * var(--u)); height: calc(8 * var(--u)); min-width: 7px; min-height: 7px; }
+.pintro__more:hover, .pintro__price:hover { text-decoration: underline; text-underline-offset: 0.2em; }
+/* Deck arrows (p11 / p12): the designer's outlined shapes, revealed by a mask
+   whose stroke is drawn along the arrow's centreline (pathLength = 1). */
+.pintro__arrows { position: absolute; left: 0; top: 0; width: 100%; height: calc(768 * var(--u)); z-index: 3; pointer-events: none; overflow: visible; }
+.pintro__arrow { opacity: 0; }
+.pintro__arrow path { fill: var(--mint-2); }
+.pintro__origin { fill: var(--mint-2); opacity: 0; }
+.pintro__reveal { fill: none; stroke: #fff; stroke-width: 16; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 1; stroke-dashoffset: 1; }
 
 /* =====================================================================
    HOME · 4 — Layers / Join us (deck p14)
@@ -268,6 +280,22 @@ section { position: relative; }
 .dv__glow { position: absolute; left: 0; top: 0; width: calc(360 * var(--u)); height: calc(360 * var(--u)); border-radius: 50%; margin: calc(-180 * var(--u)) 0 0 calc(-180 * var(--u)); background: radial-gradient(circle, rgba(162,228,184,0.95), rgba(162,228,184,0) 68%); filter: blur(calc(14 * var(--u))); will-change: transform; pointer-events: none; }
 
 /* =====================================================================
+   DEVICE 2 — deck p26-40 as one pinned stage. Each chapter's render (and
+   its mint annotations) crossfades in and drifts up while the copy fades
+   in/out at its deck position — the parallax variant of the device page.
+   ===================================================================== */
+.dv2 { height: calc(var(--n, 13) * var(--vh)); }
+.dv2__stage { position: sticky; top: 0; height: var(--vh); overflow: hidden; background: var(--white); }
+.dv2 .ch { position: absolute; inset: 0; pointer-events: none; }
+.dv2 .ch__visual { position: absolute; inset: 0; opacity: 0; visibility: hidden; will-change: opacity, transform; }
+.dv2 .ch .dv__copy, .dv2 .ch .dv__col { opacity: 0; will-change: opacity, transform; }
+.dv2__glow { position: absolute; z-index: 0; width: calc(360 * var(--u)); height: calc(360 * var(--u)); border-radius: 50%; background: radial-gradient(circle, rgba(162,228,184,0.95), rgba(162,228,184,0) 68%); filter: blur(calc(14 * var(--u))); pointer-events: none; }
+.dv2__glow--l { left: calc(-180 * var(--u)); top: calc(42% - (180 * var(--u))); }
+.dv2__glow--r { right: calc(-180 * var(--u)); top: calc(48% - (180 * var(--u))); }
+.dv2__glow--b { left: calc(34% - (180 * var(--u))); bottom: calc(-200 * var(--u)); }
+.dv2__glow--t { left: calc(62% - (180 * var(--u))); top: calc(-200 * var(--u)); }
+
+/* =====================================================================
    ORDER PAGE (deck p15-22)
    Stage 981x594 at (37,149) in #eaeaea, panel column at x1089.
    ===================================================================== */
@@ -348,6 +376,28 @@ section { position: relative; }
 .lib__intro p { font-size: var(--fs-body); line-height: calc(15.5 / 13); color: var(--grey); }
 .lib__intro h1 + p { margin-top: calc(16 * var(--u)); }
 .lib__intro p + p { margin-top: calc(15.5 / 13 * 1em); }
+/* Search (deck p42 -> p43): the magnifier slides 419pt to the right while the
+   black underline (553-946pt) draws in and the mint dot appears after SEARCH. */
+.lib__search { position: absolute; left: calc(438 * var(--u)); top: calc(148 * var(--u)); width: calc(560 * var(--u)); height: calc(42 * var(--u)); }
+.lib__search h2 { cursor: pointer; }
+.lib__search-dot { position: absolute; left: calc(90 * var(--u)); top: calc(26 * var(--u)); width: calc(17 * var(--u)); height: calc(17 * var(--u)); min-width: 10px; min-height: 10px; border-radius: 50%; background: var(--mint-2); opacity: 0; transform: scale(0.4); transition: opacity 0.35s var(--ease), transform 0.45s var(--ease); }
+.lib__search-field { position: absolute; left: calc(115 * var(--u)); top: 0; width: calc(393 * var(--u)); height: calc(32 * var(--u)); }
+.lib__search-field input { width: 100%; height: 100%; border: 0; background: transparent; font-size: var(--fs-body); font-weight: 500; color: var(--ink); padding: 0; border-radius: 0; opacity: 0; pointer-events: none; transition: opacity 0.3s var(--ease) 0.25s; }
+.lib__search-field input:focus { outline: none; }
+.lib__search-field input::-webkit-search-cancel-button, .lib__search-field input::-webkit-search-decoration { -webkit-appearance: none; appearance: none; }
+.lib__search-line { position: absolute; left: 0; bottom: calc(-1 * var(--u)); width: 100%; height: calc(3 * var(--u)); min-height: 2px; background: var(--black); transform: scaleX(0); transform-origin: left center; transition: transform 0.6s var(--ease); }
+.lib__search-btn { position: absolute; left: calc(111 * var(--u)); top: calc(10 * var(--u)); width: calc(24 * var(--u)); height: calc(24 * var(--u)); min-width: 18px; min-height: 18px; display: grid; place-items: center; color: var(--black); transition: transform 0.6s var(--ease); }
+.lib__search-btn svg { width: 100%; height: 100%; fill: none; stroke: currentColor; stroke-width: 3; stroke-linecap: round; vector-effect: non-scaling-stroke; }
+.lib__search.is-open .lib__search-btn { transform: translateX(calc(419 * var(--u))); }
+.lib__search.is-open .lib__search-dot { opacity: 1; transform: scale(1); }
+.lib__search.is-open .lib__search-line { transform: scaleX(1); }
+.lib__search.is-open .lib__search-field input { opacity: 1; pointer-events: auto; }
+.is-placeholder, .is-placeholder button { text-decoration: line-through; text-decoration-thickness: 1px; opacity: 0.55; }
+.lib__order { font-size: var(--fs-h); font-weight: 700; line-height: var(--lh); text-transform: uppercase; color: var(--black); }
+.lib__intro { position: absolute; left: calc(55 * var(--u)); top: calc(148 * var(--u)); max-width: calc(380 * var(--u)); }
+.lib__intro p { font-size: var(--fs-body); line-height: calc(15.5 / 13); color: var(--grey); }
+.lib__intro h1 + p { margin-top: calc(16 * var(--u)); }
+.lib__intro p + p { margin-top: calc(15.5 / 13 * 1em); }
 .lib__search { position: absolute; left: calc(438 * var(--u)); top: calc(148 * var(--u)); display: flex; align-items: center; gap: calc(10 * var(--u)); }
 .lib__search h2 { cursor: pointer; }
 .lib__search-btn { width: calc(24 * var(--u)); height: calc(24 * var(--u)); min-width: 18px; min-height: 18px; display: grid; place-items: center; color: var(--black); }
@@ -412,10 +462,11 @@ main.fit > .footer { flex: 0 0 auto; }
   .film__cap--a { left: 20px; right: 20px; top: 24vh; max-width: none; }
   .film__cap--b { top: auto; bottom: 14vh; }
 
-  .pintro { display: flex; flex-direction: column; justify-content: center; gap: 22px; padding: 90px 20px 60px; height: auto; }
+  .pintro { height: auto; }
+  .pintro__sticky { position: static; height: auto; display: flex; flex-direction: column; justify-content: center; gap: 22px; padding: 90px 20px 60px; }
   .pintro__device { position: static; width: 82%; margin: 0 auto; }
-  .pintro__copy, .pintro__price { position: static; }
-  .pintro__line { display: none; }
+  .pintro__copy, .pintro__price, .pintro__more { position: static; }
+  .pintro__arrows { display: none; }
 
   .layers { display: flex; flex-direction: column; justify-content: center; padding: 80px 20px 60px; gap: 22px; height: auto; }
   .layers__circles { display: flex; gap: 12px; }
@@ -439,6 +490,13 @@ main.fit > .footer { flex: 0 0 auto; }
   .dv__rot-img:first-child { display: block; opacity: 1; }
   .dv__glow { display: none; }
 
+  .dv2 { height: auto; padding-bottom: 20px; }
+  .dv2__stage { position: static; height: auto; }
+  .dv2 .ch { position: relative; inset: auto; padding: 0 20px 56px; pointer-events: auto; }
+  .dv2 .ch__visual { position: relative; opacity: 1 !important; visibility: visible !important; transform: none !important; }
+  .dv2 .ch .dv__copy, .dv2 .ch .dv__col { opacity: 1 !important; transform: none !important; }
+  .dv2__glow { display: none; }
+
   .order { height: auto; padding: 90px 16px 40px; }
   .order__stage { position: relative; left: auto; top: auto; width: 100%; height: auto; aspect-ratio: 981 / 594; }
   .order__slide { width: 70%; }
@@ -450,9 +508,14 @@ main.fit > .footer { flex: 0 0 auto; }
   .order__acc { padding: 16px; }
 
   .lib { height: auto; padding: 100px 20px 60px; }
-  .lib__intro, .lib__search, .lib__order, .lib__rooms, .lib__scenes, .lib__lounge, .lib__video, .lib__circle { position: static; max-width: none; }
-  .lib__search { margin-top: 28px; }
-  .lib__search-field input { width: 100%; }
+  .lib__intro, .lib__search, .lib__order, .lib__rooms, .lib__scenes, .lib__lounge, .lib__circle { position: static; max-width: none; }
+  .lib__video { position: relative; left: auto; top: auto; }
+  .lib__search { margin-top: 28px; width: auto; height: auto; display: flex; align-items: center; gap: 10px; }
+  .lib__search-dot { display: none; }
+  .lib__search-field { position: static; width: 0; height: 32px; overflow: hidden; transition: width 0.5s var(--ease); }
+  .lib__search.is-open .lib__search-field { width: 60%; }
+  .lib__search-btn { position: static; transition: none; }
+  .lib__search.is-open .lib__search-btn { transform: none; }
   .lib__order { margin-top: 28px; text-align: left; white-space: normal; display: block; }
   .lib__rooms { margin-top: 36px; }
   .lib__scenes { margin-top: 14px; }

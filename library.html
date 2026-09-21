@@ -19,7 +19,7 @@
   <header class="nav" id="nav">
     <a class="nav__brand" href="index.html" aria-label="SOL — home"><svg class="wm" viewBox="0 0 22.2 9.2" aria-hidden="true"><use href="#wm-sol"/></svg></a>
     <nav class="nav__menu" aria-label="Primary">
-      <a href="device.html">Device</a>
+      <div class="nav__row nav__row--inline"><a href="device.html">Device 1</a><span class="nav__sep" aria-hidden="true">/</span><a href="device2.html">Device 2</a></div>
       <a href="library.html" class="is-active" aria-current="page">Library</a>
       <a href="wiki.html">Wiki</a>
       <a href="careers.html">Careers</a>
@@ -36,10 +36,14 @@
         <p>To bring magical moments into your everyday life,<br>we are gathering endless scenarios to train and teach SOL.<br>Leave the subtle actions to SOL,<br>and keep your day flowing without interruption.</p>
       </div>
 
-      <div class="lib__search">
+      <div class="lib__search" id="libSearch">
         <h2 id="searchTitle">Search</h2>
-        <button class="lib__search-btn" id="searchToggle" type="button" aria-label="Search scenarios"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="10" r="7"/><line x1="15.5" y1="15.5" x2="21.5" y2="21.5"/></svg></button>
-        <div class="lib__search-field"><i class="dot" aria-hidden="true"></i><input type="search" placeholder="Search scenarios" aria-label="Search scenarios"></div>
+        <i class="lib__search-dot" aria-hidden="true"></i>
+        <div class="lib__search-field">
+          <input id="libSearchInput" type="search" aria-label="Search scenarios" autocomplete="off">
+          <i class="lib__search-line" aria-hidden="true"></i>
+        </div>
+        <button class="lib__search-btn" id="searchToggle" type="button" aria-label="Search scenarios" aria-expanded="false"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="10" r="7"/><line x1="15.5" y1="15.5" x2="21.5" y2="21.5"/></svg></button>
       </div>
 
       <a class="lib__order" href="order.html">Order<br>this<br>experience</a>
@@ -56,32 +60,32 @@
         <li><button type="button">Sleeping in bed</button></li>
         <li><button type="button">Using smartphone in bed</button></li>
         <li><button type="button" class="is-on">Wake up in the morning</button></li>
-        <li><button type="button">Watching a film in bed</button></li>
-        <li><button type="button">Getting dressed</button></li>
-        <li><button type="button">Late-night water</button></li>
-        <li><button type="button">Leaving for the day</button></li>
+        <li class="is-placeholder"><button type="button">Watching a film in bed</button></li>
+        <li class="is-placeholder"><button type="button">Getting dressed</button></li>
+        <li class="is-placeholder"><button type="button">Late-night water</button></li>
+        <li class="is-placeholder"><button type="button">Leaving for the day</button></li>
       </ul>
       <ul class="lib__scenes" data-room="living" hidden>
-        <li><button type="button" class="is-on">Reading on the sofa</button></li>
-        <li><button type="button">Watching TV</button></li>
-        <li><button type="button">Guests arriving</button></li>
-        <li><button type="button">Evening wind-down</button></li>
-        <li><button type="button">Kids playing</button></li>
-        <li><button type="button">Leaving the room</button></li>
+        <li class="is-placeholder"><button type="button" class="is-on">Reading on the sofa</button></li>
+        <li class="is-placeholder"><button type="button">Watching TV</button></li>
+        <li class="is-placeholder"><button type="button">Guests arriving</button></li>
+        <li class="is-placeholder"><button type="button">Evening wind-down</button></li>
+        <li class="is-placeholder"><button type="button">Kids playing</button></li>
+        <li class="is-placeholder"><button type="button">Leaving the room</button></li>
       </ul>
       <ul class="lib__scenes" data-room="office" hidden>
-        <li><button type="button" class="is-on">Deep work</button></li>
-        <li><button type="button">Video call</button></li>
-        <li><button type="button">Taking a break</button></li>
-        <li><button type="button">Reading documents</button></li>
-        <li><button type="button">End of day</button></li>
+        <li class="is-placeholder"><button type="button" class="is-on">Deep work</button></li>
+        <li class="is-placeholder"><button type="button">Video call</button></li>
+        <li class="is-placeholder"><button type="button">Taking a break</button></li>
+        <li class="is-placeholder"><button type="button">Reading documents</button></li>
+        <li class="is-placeholder"><button type="button">End of day</button></li>
       </ul>
       <ul class="lib__scenes" data-room="cafe" hidden>
-        <li><button type="button" class="is-on">Morning opening</button></li>
-        <li><button type="button">Busy afternoon</button></li>
-        <li><button type="button">Reading alone</button></li>
-        <li><button type="button">Evening ambience</button></li>
-        <li><button type="button">Closing time</button></li>
+        <li class="is-placeholder"><button type="button" class="is-on">Morning opening</button></li>
+        <li class="is-placeholder"><button type="button">Busy afternoon</button></li>
+        <li class="is-placeholder"><button type="button">Reading alone</button></li>
+        <li class="is-placeholder"><button type="button">Evening ambience</button></li>
+        <li class="is-placeholder"><button type="button">Closing time</button></li>
       </ul>
 
       <h2 class="lib__lounge">Lounge</h2>

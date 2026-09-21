@@ -236,16 +236,28 @@
       });
     }
 
-    // Product intro: mint line draws from the price up to the ORDER item.
-    const path = $("#orderPath");
-    if (path) {
-      const len = path.getTotalLength();
-      gsap.set(path, { strokeDasharray: len, strokeDashoffset: len });
-      gsap.to(path, { strokeDashoffset: 0, ease: "none",
-        scrollTrigger: { trigger: ".pintro", start: "top 70%", end: "top top", scrub: true } });
-      const head = $("#orderHead");
-      if (head) gsap.fromTo(head, { autoAlpha: 0 }, { autoAlpha: 1, ease: "none",
-        scrollTrigger: { trigger: ".pintro", start: "top 12%", end: "top top", scrub: true } });
+    // Product intro (deck p11-13): pinned for three viewport heights. The
+    // deck's own arrow shapes are revealed along their centreline — first from
+    // the price up to ORDER, then from "Discover More About Sol" to DEVICE.
+    const pintro = $("#pintro");
+    if (pintro && $("#arrowA") && !isMobile()) {
+      const A = { g: $("#arrowA"), reveal: $("#arrowRevealA"), origin: $("#arrowA .pintro__origin"), target: $('.nav__menu a[href="order.html"]') };
+      const B = { g: $("#arrowB"), reveal: $("#arrowRevealB"), origin: $("#arrowB .pintro__origin"), target: $(".nav__menu .nav__row--inline") };
+      const ps = { p: 0 };
+      const arrow = (ar, draw, vis) => {
+        ar.reveal.style.strokeDashoffset = (1 - draw).toFixed(4);
+        ar.g.style.opacity = vis.toFixed(3);
+        ar.origin.style.opacity = (vis * clamp(draw * 8, 0, 1)).toFixed(3);
+        if (ar.target) ar.target.classList.toggle("is-hint", vis > 0.5 && draw > 0.995);
+      };
+      const paint = () => {
+        const p = ps.p;
+        arrow(A, clamp((p - 0.05) / 0.30, 0, 1), 1 - clamp((p - 0.42) / 0.06, 0, 1));
+        arrow(B, clamp((p - 0.52) / 0.32, 0, 1), clamp((p - 0.48) / 0.04, 0, 1));
+      };
+      paint();
+      gsap.to(ps, { p: 1, ease: "none", onUpdate: paint,
+        scrollTrigger: { trigger: pintro, start: "top top", end: "bottom bottom", scrub: 0.5 } });
     }
 
     // Layers: mint discs (deck p13) become the photo crops (p14) as they rise.
@@ -275,6 +287,29 @@
         scrollTrigger: { trigger: ".dv--rot", start: "top top", end: "bottom bottom", scrub: 0.5 } });
     }
 
+    // Device 2 (deck p26-40 on one pinned stage): renders crossfade and drift
+    // (parallax) while each chapter's copy fades in/out at its deck position.
+    const stage2 = $("#dv2Stage");
+    if (stage2 && !isMobile()) {
+      const chs = $$(".ch", stage2).map((ch) => ({ vis: $(".ch__visual", ch), copy: $$(".dv__copy, .dv__col", ch) }));
+      const N = chs.length, st2 = { p: 0 };
+      const paint2 = () => {
+        const c = st2.p * N, H = stage2.clientHeight;
+        chs.forEach((ch, i) => {
+          const d = c - (i + 0.5), ad = Math.abs(d);
+          const vo = clamp((0.59 - ad) / 0.18, 0, 1);
+          ch.vis.style.opacity = vo.toFixed(3);
+          ch.vis.style.visibility = vo > 0.001 ? "visible" : "hidden";
+          ch.vis.style.transform = `translate3d(0, ${(-d * H * 0.05).toFixed(1)}px, 0)`;
+          const to = clamp((0.42 - ad) / 0.1, 0, 1);
+          ch.copy.forEach((el) => { el.style.opacity = to.toFixed(3); el.style.transform = `translate3d(0, ${(-d * 28).toFixed(1)}px, 0)`; });
+        });
+      };
+      paint2();
+      gsap.to(st2, { p: 1, ease: "none", onUpdate: paint2,
+        scrollTrigger: { trigger: "#dv2", start: "top top", end: "bottom bottom", scrub: 0.5 } });
+    }
+
     // Reveals
     $$("[data-reveal]").forEach((el) => ScrollTrigger.create({ trigger: el, start: "top 88%", once: true, onEnter: () => el.classList.add("is-in") }));
 
@@ -286,6 +321,8 @@
     if (film) film.load(Math.round(film.TOTAL * 0.45)).then(() => { film.draw(film.TOTAL * 0.45); film.overlay(0.3); });
     const rot = $$(".dv__rot-img");
     rot.forEach((im, i) => { im.style.opacity = i === 0 ? 1 : 0; });
+    const first = $("#dv2Stage .ch");
+    if (first) { const v = $(".ch__visual", first); v.style.opacity = 1; v.style.visibility = "visible"; $$(".dv__copy, .dv__col", first).forEach((el) => { el.style.opacity = 1; }); }
   }
 
   /* ------------------------------------------------------------------
@@ -370,10 +407,21 @@
       $$("button", l).forEach((x) => x.classList.toggle("is-on", x === b));
     })));
 
-    const search = $(".lib__search");
-    const toggle = () => { search.classList.toggle("is-open"); if (search.classList.contains("is-open")) $("input", search)?.focus(); };
-    $("#searchToggle")?.addEventListener("click", toggle);
-    $("#searchTitle")?.addEventListener("click", toggle);
+    // Search: magnifier slides right, underline draws in; typing filters the list.
+    const search = $("#libSearch"), input = $("#libSearchInput"), toggleBtn = $("#searchToggle");
+    const filter = (q) => { q = q.trim().toLowerCase(); $$(".lib__scenes li").forEach((li) => { li.hidden = !!q && !li.textContent.toLowerCase().includes(q); }); };
+    const open = (force) => {
+      if (!search) return;
+      const on = force ?? !search.classList.contains("is-open");
+      search.classList.toggle("is-open", on);
+      toggleBtn?.setAttribute("aria-expanded", String(on));
+      if (on) setTimeout(() => input?.focus({ preventScroll: true }), 300);
+      else if (input) { input.value = ""; filter(""); }
+    };
+    toggleBtn?.addEventListener("click", () => open());
+    $("#searchTitle")?.addEventListener("click", () => open());
+    input?.addEventListener("input", () => filter(input.value));
+    input?.addEventListener("keydown", (e) => { if (e.key === "Escape") open(false); });
 
     const box = $(".lib__video");
     $("#libPlay")?.addEventListener("click", () => {
