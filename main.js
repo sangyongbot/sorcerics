@@ -204,8 +204,8 @@
       if (vertical) {
         // Captions slide up into place just before their scene and slide out
         // right after it (brief, Scout-style). Film beats (240 frames):
-        // the lamp switches on around frame 30-40 (p ≈ 0.13); the room dims
-        // to night from frame ~215 (p ≈ 0.9).
+        // the lamp switches on around frame 30-40 (p ≈ 0.13, still behind the
+        // cover), she sits with the lit lamp p ≈ 0.26-0.48, night from p ≈ 0.9.
         const slide = (a0, a1, b0, b1, dist) => {
           const o = band(p, a0, a1, b0, b1);
           let y = 0;
@@ -213,13 +213,15 @@
           else if (p > b0) { const t = clamp((p - b0) / (b1 - b0), 0, 1); y = -dist * t * t; }     // accelerate out upward
           return { o, y };
         };
-        const A = slide(0.10, 0.15, 0.24, 0.29, 64), B = slide(0.86, 0.91, 2, 3, 64);
+        // The cover has fully lifted at p = 0.25 (one viewport of scroll), so the
+        // first caption waits for the lit-lamp / sofa scene right after it.
+        const A = slide(0.26, 0.31, 0.43, 0.48, 64), B = slide(0.86, 0.91, 2, 3, 64);
         if (capA) { capA.style.opacity = A.o.toFixed(3); capA.style.transform = `translateY(${A.y.toFixed(1)}px)`; }
         if (capB) { capB.style.opacity = B.o.toFixed(3); capB.style.transform = `translate(-50%, ${B.y.toFixed(1)}px)`; }
         if (trackFill) trackFill.style.transform = `scaleY(${p.toFixed(4)})`;
         if (trackDot && track) trackDot.style.transform = `translate(-50%, calc(${(p * track.clientHeight).toFixed(1)}px - 50%))`;
       } else {
-        const a = band(p, 0.08, 0.16, 0.5, 0.6), b = band(p, 0.7, 0.8, 2, 3);
+        const a = band(p, 0.25, 0.33, 0.52, 0.6), b = band(p, 0.7, 0.8, 2, 3);   // starts once the cover has lifted
         if (capA) { capA.style.opacity = a; capA.style.transform = `translateY(${((1 - a) * 14).toFixed(1)}px)`; }
         if (capB) { capB.style.opacity = b; capB.style.transform = `translate(-50%, ${((1 - b) * 14).toFixed(1)}px)`; }
       }
