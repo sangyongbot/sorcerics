@@ -45,7 +45,11 @@
   --z-overlay: 1300;  /* modals / loaders */
 
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  /* --vh: the visible area with the browser UI shown (page-fit sections, centring).
+     --vhl: the LARGE viewport (100vh on iOS/Android = toolbar collapsed) for pinned
+     full-screen media, so nothing is left uncovered when the mobile toolbar hides. */
   --vh: 100vh;
+  --vhl: 100vh;
 }
 @supports (height: 100svh) { :root { --vh: 100svh; } }
 
@@ -142,11 +146,11 @@ section { position: relative; }
    ===================================================================== */
 .cover {
   position: relative; z-index: var(--z-cover);
-  height: var(--vh); background: var(--black);
+  height: var(--vhl); background: var(--black);
   overflow: hidden;
 }
 .intro {
-  position: absolute; inset: 0;
+  position: absolute; left: 0; right: 0; top: 0; height: var(--vh);   /* centred in the visible area, like the nav */
   display: flex; align-items: center; justify-content: center;
   color: var(--mint); font-size: var(--fs-body); font-weight: 500; white-space: nowrap;
 }
@@ -164,14 +168,14 @@ section { position: relative; }
 .film {
   --film-len: 4;                 /* viewport heights the 240 frames are spread over */
   position: relative; z-index: var(--z-film);
-  margin-top: calc(-1 * var(--vh));
-  height: calc((1 + var(--film-len)) * var(--vh));
+  margin-top: calc(-1 * var(--vhl));
+  height: calc((1 + var(--film-len)) * var(--vhl));
   background: var(--black);
 }
 /* Touch devices: a flick covers far more pixels than a wheel notch, so the film
    gets twice the scroll length (frames per scrolled pixel halves). */
 @media (hover: none) and (pointer: coarse) { .film { --film-len: 8; } }
-.film__sticky { position: sticky; top: 0; height: var(--vh); width: 100%; overflow: hidden; background: #e9e9e6; }
+.film__sticky { position: sticky; top: 0; height: var(--vhl); width: 100%; overflow: hidden; background: #e9e9e6; }
 .film__canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
 .film__scrim { position: absolute; inset: 0; pointer-events: none;
   background: linear-gradient(to bottom, rgba(0,0,0,0.42), rgba(0,0,0,0.12) 32%, rgba(0,0,0,0) 52%); }
@@ -190,8 +194,8 @@ section { position: relative; }
 /* =====================================================================
    HOME · 3 — Product intro (deck p10-13)
    ===================================================================== */
-.pintro { height: calc(3 * var(--vh)); }
-.pintro__sticky { position: sticky; top: 0; height: var(--vh); overflow: hidden; }
+.pintro { height: calc(3 * var(--vhl)); }
+.pintro__sticky { position: sticky; top: 0; height: var(--vhl); overflow: hidden; }
 .pintro__device { position: absolute; left: calc(171 * var(--u)); top: calc(149 * var(--u)); width: calc(793 * var(--u)); z-index: 1; }
 .pintro__copy { position: absolute; left: calc(53 * var(--u)); top: calc(336 * var(--u)); z-index: 2; font-size: var(--fs-body); line-height: calc(16 / 13); color: var(--mint); }
 .pintro__more, .pintro__price { position: absolute; z-index: 2; display: inline-flex; align-items: center; gap: calc(9 * var(--u)); font-size: var(--fs-body); line-height: calc(16 / 13); color: var(--mint); white-space: nowrap; }
@@ -288,8 +292,8 @@ section { position: relative; }
 .dv__glowb { position: absolute; z-index: 0; left: 50%; bottom: calc(-140 * var(--u)); width: calc(520 * var(--u)); height: calc(320 * var(--u)); transform: translateX(-30%); border-radius: 50%; background: radial-gradient(ellipse at center, rgba(162,228,184,0.85), rgba(162,228,184,0) 70%); filter: blur(calc(18 * var(--u))); pointer-events: none; }
 
 /* rotation scrub (deck p29-32): sticky stage, 5 renders, a mint glow that travels */
-.dv--rot { height: calc(4 * var(--vh)); min-height: 0; overflow: visible; }
-.dv__stage { position: sticky; top: 0; height: var(--vh); overflow: hidden; background: var(--white); }
+.dv--rot { height: calc(4 * var(--vhl)); min-height: 0; overflow: visible; }
+.dv__stage { position: sticky; top: 0; height: var(--vhl); overflow: hidden; background: var(--white); }
 .dv__rot-img { position: absolute; top: calc(-65 * var(--u)); left: calc(651.5 * var(--u)); width: calc(795 * var(--u)); transform: translateX(-50%); opacity: 0; will-change: opacity; }
 .dv__rot-img:first-child { opacity: 1; }
 .dv__glow { position: absolute; left: 0; top: 0; width: calc(360 * var(--u)); height: calc(360 * var(--u)); border-radius: 50%; margin: calc(-180 * var(--u)) 0 0 calc(-180 * var(--u)); background: radial-gradient(circle, rgba(162,228,184,0.95), rgba(162,228,184,0) 68%); filter: blur(calc(14 * var(--u))); will-change: transform; pointer-events: none; }
@@ -299,12 +303,12 @@ section { position: relative; }
    its mint annotations) crossfades in and drifts up while the copy fades
    in/out at its deck position — the parallax variant of the device page.
    ===================================================================== */
-.dv2 { height: calc(var(--n, 13) * var(--vh)); }
-.dv2__stage { position: sticky; top: 0; height: var(--vh); overflow: hidden; background: var(--white); }
+.dv2 { height: calc(var(--n, 13) * var(--vhl)); }
+.dv2__stage { position: sticky; top: 0; height: var(--vhl); overflow: hidden; background: var(--white); }
 /* Each chapter keeps the deck's 768pt-tall composition and is centred in the
    viewport when the viewport is taller than the deck page (top-aligned when
    it is shorter), so the render + copy never sit high in the frame. */
-.dv2 .ch { position: absolute; left: 0; right: 0; top: max(0px, calc((var(--vh) - (768 * var(--u))) / 2)); height: calc(768 * var(--u)); pointer-events: none; }
+.dv2 .ch { position: absolute; left: 0; right: 0; top: max(0px, calc((var(--vhl) - (768 * var(--u))) / 2)); height: calc(768 * var(--u)); pointer-events: none; }
 .dv2 .ch__visual { position: absolute; inset: 0; opacity: 0; visibility: hidden; will-change: opacity, transform; }
 .dv2 .ch .dv__copy, .dv2 .ch .dv__col { opacity: 0; will-change: opacity, transform; }
 .dv2__glow { position: absolute; z-index: 0; width: calc(360 * var(--u)); height: calc(360 * var(--u)); border-radius: 50%; background: radial-gradient(circle, rgba(162,228,184,0.95), rgba(162,228,184,0) 68%); filter: blur(calc(14 * var(--u))); pointer-events: none; }
