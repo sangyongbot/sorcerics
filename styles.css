@@ -162,11 +162,15 @@ section { position: relative; }
    --film-len = how many viewport heights the 120 frames are spread over.
    ===================================================================== */
 .film {
+  --film-len: 4;                 /* viewport heights the 240 frames are spread over */
   position: relative; z-index: var(--z-film);
   margin-top: calc(-1 * var(--vh));
-  height: calc((1 + var(--film-len, 4)) * var(--vh));
+  height: calc((1 + var(--film-len)) * var(--vh));
   background: var(--black);
 }
+/* Touch devices: a flick covers far more pixels than a wheel notch, so the film
+   gets twice the scroll length (frames per scrolled pixel halves). */
+@media (hover: none) and (pointer: coarse) { .film { --film-len: 8; } }
 .film__sticky { position: sticky; top: 0; height: var(--vh); width: 100%; overflow: hidden; background: #e9e9e6; }
 .film__canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
 .film__scrim { position: absolute; inset: 0; pointer-events: none;
