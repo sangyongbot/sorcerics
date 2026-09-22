@@ -202,11 +202,20 @@
     }
     function overlay(p) {
       if (vertical) {
-        // Captions travel upward through the frame as you scroll (Scout-style).
-        const tA = clamp((p - 0.06) / 0.52, 0, 1), a = band(p, 0.06, 0.14, 0.48, 0.58);
-        const tB = clamp((p - 0.66) / 0.34, 0, 1), b = band(p, 0.66, 0.76, 2, 3);
-        if (capA) { capA.style.opacity = a; capA.style.transform = `translateY(${((1 - tA) * H * 0.3).toFixed(1)}px)`; }   // rises from 30% below to its deck position, fades there
-        if (capB) { capB.style.opacity = b; capB.style.transform = `translate(-50%, ${((1 - tB) * H * 0.3).toFixed(1)}px)`; }
+        // Captions slide up into place just before their scene and slide out
+        // right after it (brief, Scout-style). Film beats (240 frames):
+        // the lamp switches on around frame 30-40 (p ≈ 0.13); the room dims
+        // to night from frame ~215 (p ≈ 0.9).
+        const slide = (a0, a1, b0, b1, dist) => {
+          const o = band(p, a0, a1, b0, b1);
+          let y = 0;
+          if (p < a1) { const t = 1 - clamp((p - a0) / (a1 - a0), 0, 1); y = dist * t * t; }        // ease in from below
+          else if (p > b0) { const t = clamp((p - b0) / (b1 - b0), 0, 1); y = -dist * t * t; }     // accelerate out upward
+          return { o, y };
+        };
+        const A = slide(0.10, 0.15, 0.24, 0.29, 64), B = slide(0.86, 0.91, 2, 3, 64);
+        if (capA) { capA.style.opacity = A.o.toFixed(3); capA.style.transform = `translateY(${A.y.toFixed(1)}px)`; }
+        if (capB) { capB.style.opacity = B.o.toFixed(3); capB.style.transform = `translate(-50%, ${B.y.toFixed(1)}px)`; }
         if (trackFill) trackFill.style.transform = `scaleY(${p.toFixed(4)})`;
         if (trackDot && track) trackDot.style.transform = `translate(-50%, calc(${(p * track.clientHeight).toFixed(1)}px - 50%))`;
       } else {
