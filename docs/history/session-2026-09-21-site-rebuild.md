@@ -1,6 +1,7 @@
 # 세션 히스토리 — 시안 정렬 재구축과 피드백 반영
 
 - **날짜:** 2026-09-21 ~ 2026-09-22 (문서 정리: 2026-09-23)
+- **도구:** Claude Code
 - **세션 ID:** `21a3e8c1-bf38-4ae4-877a-f8116751836c`
 - **돌아가기:** 이 프로젝트 폴더에서 `claude --resume 21a3e8c1-bf38-4ae4-877a-f8116751836c` · 트랜스크립트 `~/.claude/projects/-Users-sj-Projects-sorcerics/21a3e8c1-bf38-4ae4-877a-f8116751836c.jsonl`
 - **시작 시점 저장소 상태:** `main` / `6160c21 init`, 작업 파일 전체가 untracked, 리모트 없음

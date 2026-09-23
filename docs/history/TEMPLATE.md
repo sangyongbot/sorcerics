@@ -1,8 +1,9 @@
 # 세션 히스토리 — <주제 한 줄>
 
 - **날짜:** YYYY-MM-DD (~ YYYY-MM-DD) (문서 정리: YYYY-MM-DD)
+- **도구:** Claude Code | Codex | …
 - **세션 ID:** `<session-id>`
-- **돌아가기:** 이 프로젝트 폴더에서 `claude --resume <session-id>` · 트랜스크립트 `~/.claude/projects/-Users-sj-Projects-sorcerics/<session-id>.jsonl`
+- **돌아가기:** 도구별 재개 명령과 기록 경로. Claude Code: 이 프로젝트 폴더에서 `claude --resume <session-id>` · 트랜스크립트 `~/.claude/projects/-Users-sj-Projects-sorcerics/<session-id>.jsonl` / Codex: `codex resume <session-id>` · `~/.codex/sessions/`
 - **시작 시점 저장소 상태:** `<브랜치>` / `<커밋> <제목>`, 작업 트리 상태
 - **요청:** 사용자의 핵심 요청(따옴표 또는 요약) → 이후 추가 요청
 - **결과:** 한 줄 요약(배포 여부, 산출물 경로)
